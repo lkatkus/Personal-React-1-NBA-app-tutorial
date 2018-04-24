@@ -7,7 +7,6 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 import { URL } from '../../../config';
-
 import Button from '../Buttons/buttons';
 import CardInfo from '../CardInfo/cardInfo';
 
@@ -40,7 +39,9 @@ class NewsList extends Component {
 
         axios.get(`${URL}/articles?_start=${start}&_end=${end}`).then( response => {
             this.setState({
-                items:[...this.state.items, ...response.data]
+                items:[...this.state.items, ...response.data],
+                start,
+                end
             })
         })
     }
