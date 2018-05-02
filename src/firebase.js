@@ -16,10 +16,28 @@ const firebaseArticles = firebaseDB.ref('articles');
 const firebaseTeams = firebaseDB.ref('teams');
 const firebaseVideos = firebaseDB.ref('videos');
 
+const firebaseLooper = (snapshot) => {
+    // PLACEHOLDER FOR DATA ITEMS
+    const data = [];
+
+    // GETTING DATA FROM FIREBASE
+    snapshot.forEach((childSnapshot)=>{
+        // PUSH CHILD DATA TO PLACEHOLDER ARRAY
+        data.push({
+            ...childSnapshot.val(),
+            id: childSnapshot.key
+        })
+    });
+
+    // RETURNING DATA TO PARENT
+    return data;
+}
+
 export {
     firebase,
     firebaseDB,
     firebaseArticles,
     firebaseVideos,
-    firebaseTeams
+    firebaseTeams,
+    firebaseLooper
 }

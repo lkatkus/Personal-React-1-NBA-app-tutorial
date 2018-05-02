@@ -2,11 +2,8 @@
 import React, { Component } from 'react';
 
 // ADDONS
-import axios from 'axios';
+import { firebaseArticles, firebaseLooper } from '../../../firebase';
 import SliderTemplates from './slider_templates';
-
-import { URL } from '../../../config';
-
 
 // COMPONENT
 class NewsSlider extends Component {
@@ -16,10 +13,19 @@ class NewsSlider extends Component {
     }
 
     componentWillMount(){
-        axios.get(`${URL}/articles?_start=${this.props.start}&_end=${this.props.amount}`).then(response => {
-            this.setState({
-                news:response.data
-            })
+        
+        // QUERY FOR GETTING DATA FROM FIREBASE
+        firebaseArticles.limitToFirst(3).once('value')
+        .then((snapshot)=>{
+            // PLACEHOLDER FOR NEWS DATA
+            const news = firebaseLooper(snapshot);
+
+            // ADDING DATA TO STATE
+            this.setState({              
+                news
+            });
+
+            console.log(this.state.news);
         })
     }
 

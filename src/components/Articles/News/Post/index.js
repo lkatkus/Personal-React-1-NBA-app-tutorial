@@ -2,8 +2,7 @@
 import React, { Component } from 'react';
 
 // ADDONS
-import axios from 'axios';
-import { URL } from '../../../../config';
+import { firebaseDB, firebaseLooper, firebaseTeams } from '../../../../firebase';
 
 // OTHER COMPONENT
 import Header from './header';
@@ -20,17 +19,24 @@ class NewsArticles extends Component {
     }
 
     componentWillMount(){
-        axios.get(`${URL}/articles?id=${this.props.match.params.id}`).then(response => {
-            // SAVE ARTICLE DATA
-            let article = response.data[0];
+        firebaseDB.ref(`articles/${this.props.match.params.id}`).once('value')
+        .then((snapshot)=>{
+            let article = snapshot.val();
 
-            // GET TEAM DATA
-            axios.get(`${URL}/teams?id=${article.team}`).then(response => {
+            firebaseTeams.orderByChild('teamId').equalTo(article.team).once('value')
+            .then((snapshot)=>{
+                const team = firebaseLooper(snapshot);
                 this.setState({
                     article,
-                    team:response.data
+                    team
                 })
             })
+            .catch((e)=>{
+                console.log(e);
+            })
+        })
+        .catch((e)=>{
+            console.log(e);
         })
     }
 
