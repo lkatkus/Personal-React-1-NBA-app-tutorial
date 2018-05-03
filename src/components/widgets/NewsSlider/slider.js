@@ -24,8 +24,6 @@ class NewsSlider extends Component {
             this.setState({              
                 news
             });
-
-            console.log(this.state.news);
         })
     }
 

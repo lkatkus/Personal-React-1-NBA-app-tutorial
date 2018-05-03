@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 
 // OTHER IMPORTS
 import FormField from '../widgets/FormFields/formfields';
+import { firebase } from '../../firebase';
 
 // CSS
 import styles from './signin.css';
@@ -104,10 +105,87 @@ class SignIn extends Component {
         return error;
     }
 
+    submitButton = () => {
+        return(
+            this.state.loading
+            ? 'loading...'
+            :
+                <div>
+                    <button onClick={ (event) => {this.submitForm(event,false)} }> Register now </button>
+                    <button onClick={ (event) => {this.submitForm(event,true)} }> Log in </button>
+                </div>
+        )
+    }
+
+    submitForm = (event,type) => {
+        event.preventDefault();
+
+        if(type != null){
+            
+            let dataToSubmit = {};
+            let formIsValid = true;
+
+            for(let key in this.state.formdata){
+                dataToSubmit[key] = this.state.formdata[key].value;
+            }
+            for(let key in this.state.formdata){
+                formIsValid = this.state.formdata[key].valid && formIsValid;
+            }
+
+            if(formIsValid){
+                this.setState({
+                    loading:true,
+                    registerError:''
+                })
+                if(type){
+                    firebase.auth()
+                    .signInWithEmailAndPassword(
+                        dataToSubmit.email,
+                        dataToSubmit.password   
+                    )
+                    .then(()=>{
+                        this.props.history.push('/');
+                    })
+                    .catch((error)=>{
+                        this.setState({
+                            loading:false,
+                            registerError: error.message
+                        })
+
+                    })
+                }else{
+                    firebase.auth()
+                    .createUserWithEmailAndPassword(
+                        dataToSubmit.email,
+                        dataToSubmit.password)
+                    .then(()=>{
+                        this.props.history.push('/');
+                    })
+                    .catch((error)=>{
+                        this.setState({
+                            loading:false,
+                            registerError: error.message
+                        })
+
+                    })
+                }
+            }
+
+        }
+    }
+
+    showError = () => {
+        return(
+            this.state.registerError !== ''
+            ? <div className={styles.errorLabel}>{this.state.registerError}</div>
+            : null
+        )
+    }
+
     render(){
         return(
             <div className={styles.logContainer}>
-                <form>
+                <form onSubmit={(event)=>{this.submitForm(event,null)}}>
                     <h2>Register / Log In</h2>
                     <FormField
                         id={'email'}
@@ -120,6 +198,9 @@ class SignIn extends Component {
                         formdata={this.state.formdata.password}
                         change={ (element) => {this.updateForm(element)} }
                     />
+
+                    { this.submitButton() }
+                    { this.showError() }
                 </form>
             </div>
         )
