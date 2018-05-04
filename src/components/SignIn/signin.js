@@ -166,11 +166,9 @@ class SignIn extends Component {
                             loading:false,
                             registerError: error.message
                         })
-
                     })
                 }
             }
-
         }
     }
 
